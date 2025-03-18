@@ -22,6 +22,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
 BuildRequires:  curl
 BuildRequires:  python2
+BuildRequires:  expat-devel
 Requires:       erlang = 19.3
 
 %description
