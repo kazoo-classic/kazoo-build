@@ -3,8 +3,18 @@
 # Script to build Kazoo and its dependencies in the correct order
 # using mock with a custom configuration
 # Automatically detects the latest version of each SRPM
+# Can take arguments to select which packages to build
 
 set -e  # Exit on any error
+
+createrepo_c /opt/rpmbuild/RPMS/
+
+
+# empty build dir
+rm -rf /opt/rpmbuild/{BUILD,BUILDROOT}
+
+# Set up RPM build environment
+mkdir -p /opt/rpmbuild/{BUILD,BUILDROOT}
 
 # Configuration
 MOCK_CONFIG_PATH="/opt/rpmbuild/MOCK/kazoo-alma8.cfg"
@@ -12,6 +22,12 @@ SRPMS_DIR="/opt/rpmbuild/SRPMS"
 RPMS_DIR="/opt/rpmbuild/RPMS"
 RESULTS_DIR="/opt/mock_results"
 LOG_DIR="/opt/mock_logs"
+
+# Package flags (default to false)
+BUILD_ERLANG=false
+BUILD_REBAR=false
+BUILD_ELIXIR=false
+BUILD_KAZOO=false
 
 # Create directories if they don't exist
 mkdir -p $RPMS_DIR $RESULTS_DIR $LOG_DIR
@@ -58,45 +74,138 @@ build_package() {
     echo ""
 }
 
+# Function to ask yes/no question
+ask_yes_no() {
+    local question=$1
+    local response
+    
+    while true; do
+        read -p "$question (y/n): " response
+        case $response in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            * ) echo "Please answer yes or y or no or n.";;
+        esac
+    done
+}
+
+# Parse command line arguments
+parse_arguments() {
+    for arg in "$@"; do
+        case $arg in
+            erlang)
+                BUILD_ERLANG=true
+                ;;
+            rebar)
+                BUILD_REBAR=true
+                ;;
+            elixir)
+                BUILD_ELIXIR=true
+                ;;
+            kazoo)
+                BUILD_KAZOO=true
+                ;;
+            *)
+                echo "Warning: Unknown argument '$arg' ignored"
+                ;;
+        esac
+    done
+}
+
+# If no arguments provided, ask interactively
+ask_interactively() {
+    if ask_yes_no "Build Erlang?"; then
+        BUILD_ERLANG=true
+    fi
+    
+    if ask_yes_no "Build Rebar?"; then
+        BUILD_REBAR=true
+    fi
+    
+    if ask_yes_no "Build Elixir?"; then
+        BUILD_ELIXIR=true
+    fi
+    
+    if ask_yes_no "Build Kazoo?"; then
+        BUILD_KAZOO=true
+    fi
+}
+
 # Initialize the repository if it doesn't have metadata yet
 if [ ! -d "$RPMS_DIR/repodata" ]; then
     echo "Initializing local repository metadata..."
     createrepo_c $RPMS_DIR/
 fi
 
-# Find the latest SRPM for each package
-ERLANG_SRPM=$(get_latest_srpm "erlang-")
-REBAR_SRPM=$(get_latest_srpm "rebar-")
-ELIXIR_SRPM=$(get_latest_srpm "elixir-")
-KAZOO_SRPM=$(get_latest_srpm "kazoo-classic-")
+# Check if any arguments were provided
+if [ $# -eq 0 ]; then
+    echo "No arguments provided. You will be asked for each package."
+    ask_interactively
+else
+    parse_arguments "$@"
+fi
 
-echo "Found the following SRPMs to build:"
-echo "Erlang: $(basename $ERLANG_SRPM)"
-echo "Rebar: $(basename $REBAR_SRPM)"
-echo "Elixir: $(basename $ELIXIR_SRPM)"
-echo "Kazoo: $(basename $KAZOO_SRPM)"
+# Show build plan
+echo "Build plan:"
+echo "  Erlang: $([ "$BUILD_ERLANG" = true ] && echo "YES" || echo "NO")"
+echo "  Rebar: $([ "$BUILD_REBAR" = true ] && echo "YES" || echo "NO")"
+echo "  Elixir: $([ "$BUILD_ELIXIR" = true ] && echo "YES" || echo "NO")"
+echo "  Kazoo: $([ "$BUILD_KAZOO" = true ] && echo "YES" || echo "NO")"
 echo ""
 
-# Build packages in order (dependencies first)
-# 1. Build erlang
-build_package "$ERLANG_SRPM"
+# Proceed only if at least one package is selected
+if [ "$BUILD_ERLANG" = false ] && [ "$BUILD_REBAR" = false ] && [ "$BUILD_ELIXIR" = false ] && [ "$BUILD_KAZOO" = false ]; then
+    echo "No packages selected for building. Exiting."
+    exit 0
+fi
 
-# 2. Build rebar
-build_package "$REBAR_SRPM"
+# Find the SRPMs for selected packages
+if [ "$BUILD_ERLANG" = true ]; then
+    ERLANG_SRPM=$(get_latest_srpm "erlang-")
+    echo "Found Erlang SRPM: $(basename $ERLANG_SRPM)"
+fi
 
-# 3. Build elixir
-build_package "$ELIXIR_SRPM"
+if [ "$BUILD_REBAR" = true ]; then
+    REBAR_SRPM=$(get_latest_srpm "rebar-")
+    echo "Found Rebar SRPM: $(basename $REBAR_SRPM)"
+fi
 
-# 4. Finally build kazoo
-build_package "$KAZOO_SRPM"
+if [ "$BUILD_ELIXIR" = true ]; then
+    ELIXIR_SRPM=$(get_latest_srpm "elixir-")
+    echo "Found Elixir SRPM: $(basename $ELIXIR_SRPM)"
+fi
+
+if [ "$BUILD_KAZOO" = true ]; then
+    KAZOO_SRPM=$(get_latest_srpm "kazoo-classic-")
+    echo "Found Kazoo SRPM: $(basename $KAZOO_SRPM)"
+fi
+
+echo ""
+
+# Build selected packages in order (dependencies first)
+if [ "$BUILD_ERLANG" = true ]; then
+    build_package "$ERLANG_SRPM"
+fi
+
+if [ "$BUILD_REBAR" = true ]; then
+    build_package "$REBAR_SRPM"
+fi
+
+if [ "$BUILD_ELIXIR" = true ]; then
+    build_package "$ELIXIR_SRPM"
+fi
+
+if [ "$BUILD_KAZOO" = true ]; then
+    build_package "$KAZOO_SRPM"
+fi
 
 echo "=========================================================="
-echo "All packages built successfully!"
+echo "All selected packages built successfully!"
 echo "=========================================================="
 echo "RPMs are available in: $RPMS_DIR"
 echo "Build logs are available in: $RESULTS_DIR"
 
-# Optional: List all built packages
+# List all built packages
 echo ""
 echo "Built packages:"
 find $RPMS_DIR -name "*.rpm" | sort

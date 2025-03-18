@@ -32,10 +32,10 @@ download_source() {
 }
 
 # empty build dir
-rm -rf /opt/rpmbuild/{BUILD,BUILDROOT,RPMS,SRPMS}
+rm -rf /opt/rpmbuild/{SRPMS}
 
 # Set up RPM build environment
-mkdir -p /opt/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+mkdir -p /opt/rpmbuild/{SOURCES,SPECS,SRPMS}
 
 # Download source files
 cd /opt/rpmbuild/SOURCES
@@ -66,7 +66,7 @@ rpmbuild --define "_topdir /opt/rpmbuild" --define "_buildhost generic-builder" 
 #sudo rpm -i --force /opt/rpmbuild/RPMS/x86_64/elixir-1.5.3-1.*.rpm
 
 echo "Downloading kazoo-configs-core from 4.3-classic branch..."
-if [ ! -d /tmp/kazoo-configs-core ] || [ "$answer" == "y" ]; then
+if [ ! -d /tmp/kazoo-configs-core ]; then
     rm -rf /tmp/kazoo-configs-core
     git clone https://github.com/kazoo-classic/kazoo-configs-core.git /tmp/kazoo-configs-core
     cd /tmp/kazoo-configs-core
@@ -78,12 +78,13 @@ else
     cd /tmp/kazoo-configs-core
     git reset --hard HEAD
     git pull
+    tar -czf /opt/rpmbuild/SOURCES/kazoo-configs-core-4.3.tar.gz -C /tmp kazoo-configs-core
 fi
 
 
 
 echo "Downloading kazoo-core from kazoo-classic..."
-if [ ! -d /tmp/kazoo ] || [ "$answer" == "y" ]; then
+if [ ! -d /tmp/kazoo ]; then
     rm -rf /tmp/kazoo
     git clone https://github.com/kazoo-classic/kazoo.git /tmp/kazoo
     tar -czf /opt/rpmbuild/SOURCES/kazoo-classic-4.3.tar.gz -C /tmp kazoo
@@ -92,6 +93,7 @@ else
     cd /tmp/kazoo
     git reset --hard HEAD
     git pull
+    tar -czf /opt/rpmbuild/SOURCES/kazoo-classic-4.3.tar.gz -C /tmp kazoo
 fi
 
 
