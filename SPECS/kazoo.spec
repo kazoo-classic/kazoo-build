@@ -2,7 +2,7 @@
 
 Name:           kazoo-classic
 Version:        4.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Kazoo - Open-Source Cloud Communications Platform
 License:        MPL-2.0
 URL:            https://github.com/kazoo-classic/kazoo
@@ -22,6 +22,8 @@ BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
 BuildRequires:  curl
 BuildRequires:  python2
+BuildRequires:  python2-devel
+BuildRequires:  expat-devel
 Requires:       erlang = 19.3
 
 %description
@@ -43,6 +45,11 @@ find %{_builddir}/kazoo -name '*.py' -type f -exec sed -i '1s|^#!.*python$|#!/us
 # Set locale to UTF-8
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
+
+# Create python symlink if needed
+if [ -f /usr/bin/python2 ] && [ ! -f /usr/bin/python ]; then
+    ln -sf /usr/bin/python2 /usr/bin/python
+fi
 
 # Build pqueue
 cd %{_builddir}/kazoo/deps/pqueue
@@ -67,7 +74,7 @@ mkdir -p %{buildroot}/etc/init.d
 mkdir -p %{buildroot}/etc/logrotate.d
 mkdir -p %{buildroot}/etc/rsyslog.d
 mkdir -p %{buildroot}/etc/security/limits.d
-mkdir -p %{buildroot}/usr/share/doc/kazoo-core-4.3
+mkdir -p %{buildroot}/usr/share/doc/kazoo-core-%{version}
 mkdir -p %{buildroot}/var/log/kazoo
 
 # Install Kazoo
@@ -91,7 +98,7 @@ if [ ! -f %{buildroot}/usr/sbin/sup ]; then
 fi
 
 # Install documentation
-install -m 644 %{_builddir}/kazoo/{README.md,LICENSE,VERSION} %{buildroot}/usr/share/doc/kazoo-core-4.3/
+install -m 644 %{_builddir}/kazoo/{README.md,LICENSE,VERSION} %{buildroot}/usr/share/doc/kazoo-core-%{version}/
 
 %files
 %defattr(-, root, root, -)
@@ -106,14 +113,6 @@ install -m 644 %{_builddir}/kazoo/{README.md,LICENSE,VERSION} %{buildroot}/usr/s
 %attr(-, kazoo, daemon) /opt/kazoo/lib/*
 %attr(-, kazoo, daemon) /opt/kazoo/releases/*
 %attr(-, kazoo, daemon) /opt/kazoo/erts-*/*
-
-# Add the previously unpackaged files
-%attr(-, kazoo, daemon) /opt/kazoo/releases/.0.1/kazoo.boot
-%attr(-, kazoo, daemon) /opt/kazoo/releases/.0.1/kazoo.rel
-%attr(-, kazoo, daemon) /opt/kazoo/releases/.0.1/kazoo.script
-%attr(-, kazoo, daemon) /opt/kazoo/releases/.0.1/start_clean.boot
-%attr(-, kazoo, daemon) /opt/kazoo/releases/.0.1/sys.config
-%attr(-, kazoo, daemon) /opt/kazoo/releases/.0.1/vm.args
 
 # Sound directories
 %dir %attr(755, kazoo, daemon) /opt/kazoo/sounds/ru/ru
@@ -138,7 +137,7 @@ install -m 644 %{_builddir}/kazoo/{README.md,LICENSE,VERSION} %{buildroot}/usr/s
 %dir %attr(777, kazoo, daemon) /var/log/kazoo
 
 # Documentation
-%doc %attr(644, root, root) /usr/share/doc/kazoo-core-4.3/*
+%doc %attr(644, root, root) /usr/share/doc/kazoo-core-%{version}/*
 
 %pre
 # Create kazoo user if it doesn't exist
@@ -170,6 +169,9 @@ if [ $1 -eq 0 ] ; then
 fi
 
 %changelog
+* Fri Mar 14 2025 Mooseable <mooseable@mooseable.com> - 4.3-3
+- Removed erroneous file copy
+
 * Fri Mar 14 2025 Mooseable <mooseable@mooseable.com> - 4.3-2
 - Updated kazoo-applications script to better detect that kazoo is running
 
