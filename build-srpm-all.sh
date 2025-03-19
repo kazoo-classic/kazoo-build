@@ -39,7 +39,6 @@ echo "Setting up RPM build environment..."
 mkdir -p ${RPMBUILD_DIR}/{SOURCES,SPECS,SRPMS,RPMS}
 
 # Empty SRPMS dir
-rm -rf ${SRPMS_DIR}/*
 mkdir -p ${SRPMS_DIR}
 
 # Helper function to download with overwrite prompt
