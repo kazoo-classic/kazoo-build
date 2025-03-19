@@ -172,6 +172,8 @@ fi
 %changelog
 * Fri Mar 14 2025 Mooseable <mooseable@mooseable.com> - 4.3-3
 - Removed erroneous file copy
+- Removed deletion of /etc/kazoo on uninstall
+- Added service file cleanup and daemon-reload
 
 * Fri Mar 14 2025 Mooseable <mooseable@mooseable.com> - 4.3-2
 - Updated kazoo-applications script to better detect that kazoo is running
