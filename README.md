@@ -17,7 +17,7 @@ dnf install git rpm-build mock tar createrepo_c -y
 
 ```bash
 cd /opt
-git clone URL-TBD
+git clone https://github.com/kazoo-classic/kazoo-build.git
 ```
 
 ### Compile the Source RPMs
