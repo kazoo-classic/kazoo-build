@@ -1,0 +1,157 @@
+{
+  "rpmbuild_dir": "/opt/rpmbuild",
+  "temp_dir": "/tmp",
+  "mock_config_path": "/opt/rpmbuild/MOCK/kazoo-alma8.cfg",
+  "results_dir": "/opt/mock_results",
+  "log_dir": "/opt/mock_logs",
+  
+  "packages": [
+    {
+      "name": "erlang",
+      "enabled": true,
+      "spec_file": "erlang.spec",
+      "sources": [
+        {
+          "file": "otp_src_19.3.tar.gz",
+          "url": "https://github.com/erlang/otp/archive/OTP-19.3.tar.gz"
+        },
+        {
+          "file": "openssl-1.0.2r.tar.gz",
+          "url": "https://www.openssl.org/source/old/1.0.2/openssl-1.0.2r.tar.gz"
+        },
+        {
+          "file": "fop-2.10-bin.tar.gz",
+          "url": "https://archive.apache.org/dist/xmlgraphics/fop/binaries/fop-2.10-bin.tar.gz"
+        }
+      ],
+      "depends_on": []
+    },
+    {
+      "name": "rebar",
+      "enabled": true,
+      "spec_file": "rebar.spec",
+      "sources": [
+        {
+          "file": "rebar-2.6.4.tar.gz",
+          "url": "https://github.com/rebar/rebar/archive/2.6.4.tar.gz"
+        }
+      ],
+      "depends_on": ["erlang"]
+    },
+    {
+      "name": "elixir",
+      "enabled": true,
+      "spec_file": "elixir.spec",
+      "sources": [
+        {
+          "file": "elixir-1.5.3.tar.gz",
+          "url": "https://github.com/elixir-lang/elixir/archive/v1.5.3.tar.gz"
+        }
+      ],
+      "depends_on": ["erlang"]
+    },
+    {
+      "name": "kazoo-classic",
+      "enabled": true,
+      "spec_file": "kazoo.spec",
+      "sources": [
+        {
+          "file": "pqueue-1.7.0.tar.gz",
+          "url": "https://github.com/okeuday/pqueue/archive/v1.7.0.tar.gz"
+        }
+      ],
+      "git_repos": [
+        {
+          "name": "kazoo-configs-core",
+          "url": "https://github.com/kazoo-classic/kazoo-configs-core.git",
+          "branch": "4.3-classic",
+          "output": "kazoo-configs-core-4.3.tar.gz"
+        },
+        {
+          "name": "kazoo",
+          "url": "https://github.com/kazoo-classic/kazoo.git",
+          "branch": "master",
+          "output": "kazoo-classic-4.3.tar.gz"
+        }
+      ],
+      "depends_on": ["erlang", "rebar", "elixir"]
+    },
+    {
+      "name": "libphonenumber",
+      "enabled": true,
+      "spec_file": "libphonenumber.spec",
+      "sources": [
+        {
+          "file": "libphonenumber-9.0.1.tar.gz",
+          "url": "https://github.com/google/libphonenumber/archive/refs/tags/v9.0.1.tar.gz"
+        }
+      ],
+      "depends_on": []
+    },
+    {
+      "name": "kamailio",
+      "enabled": true,
+      "spec_file": "kamailio.spec",
+      "sources": [
+        {
+          "file": "kamailio-5.5.7_src.tar.gz",
+          "url": "https://www.kamailio.org/pub/kamailio/5.5.7/src/kamailio-5.5.7_src.tar.gz"
+        }
+      ],
+      "depends_on": ["libphonenumber"]
+    },
+    {
+      "name": "broadvoice",
+      "enabled": true,
+      "spec_file": "broadvoice.spec",
+      "sources": [
+        {
+          "file": "broadvoice-0.1.0.tar.gz",
+          "url": "http://www.soft-switch.org/downloads/codecs/broadvoice-0.1.0.tar.gz"
+        }
+      ],
+      "depends_on": []
+    },
+    {
+      "name": "flite",
+      "enabled": true,
+      "spec_file": "flite.spec",
+      "sources": [
+        {
+          "file": "flite-2.2-release.tar.gz",
+          "url": "https://github.com/festvox/flite/archive/refs/tags/v2.2.tar.gz"
+        }
+      ],
+      "depends_on": []
+    },
+    {
+      "name": "freeswitch",
+      "enabled": true,
+      "spec_file": "freeswitch.spec",
+      "sources": [
+        {
+          "file": "freeswitch-1.10.9.-release.tar.gz",
+          "url": "https://files.freeswitch.org/releases/freeswitch/freeswitch-1.10.9.-release.tar.gz"
+        },
+        {
+          "file": "freeradius-client-1.1.7.tar.gz",
+          "url": "https://files.freeswitch.org/downloads/libs/freeradius-client-1.1.7.tar.gz"
+        },
+        {
+          "file": "communicator_semi_6000_20080321.tar.gz",
+          "url": "http://files.freeswitch.org/downloads/libs/communicator_semi_6000_20080321.tar.gz"
+        },
+        {
+          "file": "pocketsphinx-0.8.tar.gz",
+          "url": "http://files.freeswitch.org/downloads/libs/pocketsphinx-0.8.tar.gz"
+        },
+        {
+          "file": "sphinxbase-0.8.tar.gz",
+          "url": "http://files.freeswitch.org/downloads/libs/sphinxbase-0.8.tar.gz"
+        }
+      ],
+      "depends_on": ["broadvoice","flite"],
+      "exclude_modules": ["signalwire"]
+    }
+  ]
+}
