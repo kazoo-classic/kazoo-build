@@ -216,7 +216,7 @@
           "url": "https://files.freeswitch.org/downloads/libs/sphinxbase-0.8.tar.gz"
         }
       ],
-      "depends_on": ["broadvoice","flite","g722_1","ilbc2","libsilk","sofia-sip","spandsp"],
+      "depends_on": ["erlang","broadvoice","flite","g722_1","ilbc2","libsilk","sofia-sip","spandsp"],
       "exclude_modules": ["signalwire"]
     }
   ]
