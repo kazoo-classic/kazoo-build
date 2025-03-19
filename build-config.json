@@ -139,6 +139,58 @@
       "depends_on": []
     },
     {
+      "name": "ilbc2",
+      "enabled": true,
+      "spec_file": "ilbc2.spec",
+      "git_repos": [
+        {
+          "name": "libilbc",
+          "url": "https://github.com/freeswitch/libilbc",
+          "branch": "master",
+          "output": "ilbc-0.0.1.tar.gz"
+        }
+      ],
+      "depends_on": []
+    },
+    {
+      "name": "libsilk",
+      "enabled": true,
+      "spec_file": "silk.spec",
+      "git_repos": [
+        {
+          "name": "libsilk",
+          "url": "https://github.com/freeswitch/libsilk",
+          "branch": "master",
+          "output": "libsilk-1.0.9.tar.gz"
+        }
+      ],
+      "depends_on": []
+    },
+    {
+      "name": "sofia-sip",
+      "enabled": true,
+      "spec_file": "sofia-sip.spec",
+      "sources": [
+        {
+          "file": "sofia-sip-1.13.17.tar.gz",
+          "url": "https://github.com/freeswitch/sofia-sip/archive/refs/tags/v1.13.17.tar.gz"
+        }
+      ],
+      "depends_on": []
+    },
+    {
+      "name": "spandsp",
+      "enabled": true,
+      "spec_file": "spandsp.spec",
+      "sources": [
+        {
+          "file": "spandsp3-3.0.0.tar.gz",
+          "url": "https://github.com/freeswitch/spandsp/archive/f995f452ee79d03c4afa90b10e86a5f9c553920c.tar.gz"
+        }
+      ],
+      "depends_on": []
+    },
+    {
       "name": "freeswitch",
       "enabled": true,
       "spec_file": "freeswitch.spec",
@@ -164,7 +216,7 @@
           "url": "http://files.freeswitch.org/downloads/libs/sphinxbase-0.8.tar.gz"
         }
       ],
-      "depends_on": ["broadvoice","flite","g722_1"],
+      "depends_on": ["broadvoice","flite","g722_1","ilbc2"],
       "exclude_modules": ["signalwire"]
     }
   ]
