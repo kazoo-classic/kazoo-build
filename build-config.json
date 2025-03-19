@@ -125,6 +125,20 @@
       "depends_on": []
     },
     {
+      "name": "g722_1",
+      "enabled": true,
+      "spec_file": "g722_1.spec",
+      "git_repos": [
+        {
+          "name": "libg7221",
+          "url": "https://github.com/freeswitch/libg7221.git",
+          "branch": "master",
+          "output": "g722_1.tar.gz"
+        }
+      ],
+      "depends_on": []
+    },
+    {
       "name": "freeswitch",
       "enabled": true,
       "spec_file": "freeswitch.spec",
@@ -150,7 +164,7 @@
           "url": "http://files.freeswitch.org/downloads/libs/sphinxbase-0.8.tar.gz"
         }
       ],
-      "depends_on": ["broadvoice","flite"],
+      "depends_on": ["broadvoice","flite","g722_1"],
       "exclude_modules": ["signalwire"]
     }
   ]
