@@ -163,8 +163,9 @@ if [ $1 -eq 0 ] ; then
     # Package removal, not upgrade
     systemctl disable kazoo-applications
     /usr/sbin/userdel kazoo
+    rm -f /usr/lib/systemd/system/kazoo-applications.service
+    systemctl daemon-reload
     rm -rf /opt/kazoo
-    rm -rf /etc/kazoo
     rm -rf /var/log/kazoo
 fi
 
