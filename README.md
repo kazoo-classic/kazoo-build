@@ -22,15 +22,33 @@ git clone URL-TBD
 
 ### Compile the Source RPMs
 
+ALL
+
 ```bash
 cd /opt/rpmbuild
 ./build-srpm-all.sh
 ```
 
+OR TARGETED (example: freeswitch)
+
+```bash
+cd /opt/rpmbuild
+./build-srpm-all.sh freeswitch
+```
+
+
 ### Build the RPMs
+
+ALL
 
 ```bash
 cd /opt/rpmbuild
 ./build-rpm-all.sh
 ```
 
+OR TARGETED (example: freeswitch)
+
+```bash
+cd /opt/rpmbuild
+./build-rpm-all.sh freeswitch
+```
