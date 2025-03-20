@@ -191,14 +191,26 @@
       "depends_on": []
     },
     {
+      "name": "libks",
+      "enabled": true,
+      "spec_file": "libks.spec",
+      "sources": [
+        {
+          "file": "libks-2-2.0.2.tar.gz",
+          "url": "https://files.freeswitch.org/downloads/libs/libks-2%202.0.2.tar.gz"
+        }
+      ],
+      "depends_on": [],
+      "exclude_modules": []
+    },
+    {
       "name": "freeswitch",
       "enabled": true,
       "spec_file": "freeswitch.spec",
-      "configure_options": "--disable-mod-mongo",
       "sources": [
         {
-          "file": "freeswitch-1.10.9.-release.tar.gz",
-          "url": "https://files.freeswitch.org/releases/freeswitch/freeswitch-1.10.9.-release.tar.gz"
+          "file": "freeswitch-1.10.9.-release.15.tar.bz2",
+          "url": "https://files.freeswitch.org/releases/freeswitch/freeswitch-1.10.9.-release.tar.bz2"
         },
         {
           "file": "freeradius-client-1.1.7.tar.gz",
@@ -217,7 +229,7 @@
           "url": "https://files.freeswitch.org/downloads/libs/sphinxbase-0.8.tar.gz"
         }
       ],
-      "depends_on": ["erlang","broadvoice","flite","g722_1","ilbc2","libsilk","sofia-sip","spandsp3"],
+      "depends_on": ["erlang","broadvoice","flite","g722_1","ilbc2","libsilk","sofia-sip","spandsp3","libks"],
       "exclude_modules": ["signalwire"]
     }
   ]
