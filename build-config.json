@@ -194,6 +194,7 @@
       "name": "freeswitch",
       "enabled": true,
       "spec_file": "freeswitch.spec",
+      "configure_options": "--disable-mod-mongo",
       "sources": [
         {
           "file": "freeswitch-1.10.9.-release.tar.gz",

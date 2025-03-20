@@ -66,15 +66,43 @@ package_rpms_exist() {
 # Function to build an SRPM and update the local repo
 build_package() {
     local srpm=$1
-    local package_name=$(basename $srpm .src.rpm)
+    local package_name=$(basename $srpm .src.rpm | cut -d'-' -f1)  # Extract base package name
     
     echo "=========================================================="
     echo "Building package: $package_name"
     echo "Using SRPM: $srpm"
     echo "=========================================================="
     
+    # Set package-specific build options
+    local mock_opts=""
+    
+    # Find package index in config
+    local pkg_idx=$(jq -r ".packages | map(.name == \"$package_name\") | index(true)" "$CONFIG_FILE")
+    
+    # Check if package has configure_options in config
+    if [ "$pkg_idx" != "null" ]; then
+        if jq -e ".packages[$pkg_idx].configure_options" "$CONFIG_FILE" > /dev/null; then
+            local configure_opts=$(jq -r ".packages[$pkg_idx].configure_options" "$CONFIG_FILE")
+            if [ -n "$configure_opts" ] && [ "$configure_opts" != "null" ]; then
+                echo "Adding configure options from config: $configure_opts"
+                mock_opts="--define=\"configure_options $configure_opts\""
+            fi
+        fi
+        
+        # Check if package has mock_options in config (for additional mock parameters)
+        if jq -e ".packages[$pkg_idx].mock_options" "$CONFIG_FILE" > /dev/null; then
+            local extra_mock_opts=$(jq -r ".packages[$pkg_idx].mock_options" "$CONFIG_FILE")
+            if [ -n "$extra_mock_opts" ] && [ "$extra_mock_opts" != "null" ]; then
+                echo "Adding extra mock options from config: $extra_mock_opts"
+                mock_opts="$mock_opts $extra_mock_opts"
+            fi
+        fi
+    fi
+    
     # Build the package with mock using the custom config file
-    mock -r $MOCK_CONFIG_PATH --resultdir=$RESULTS_DIR/$package_name $srpm
+    echo "Running: mock -r $MOCK_CONFIG_PATH $mock_opts --resultdir=$RESULTS_DIR/$package_name $srpm"
+    # Use eval to ensure quotes are properly handled
+    eval mock -r $MOCK_CONFIG_PATH $mock_opts --resultdir=$RESULTS_DIR/$package_name $srpm
     
     # Check if build was successful
     if [ $? -ne 0 ]; then
