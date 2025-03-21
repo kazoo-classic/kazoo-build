@@ -1,11 +1,11 @@
 Name:           libks
-Version:        2.0.2
+Version:        1.8.2
 Release:        1%{?dist}
 Summary:        Foundational support for signalwire C products
 
 License:        MIT
-URL:            https://example.com/libks-2
-Source0:        libks-2-2.0.2.tar.gz
+URL:            https://github.com/signalwire/libks/
+Source0:        libks-1.8.2.tar.gz
 
 # Build dependencies for AlmaLinux 8 (which already has cmake)
 BuildRequires:  cmake >= 3.7.2
@@ -16,7 +16,7 @@ BuildRequires:  libatomic
 %description
 Foundational support for signalwire C products
 %prep
-%setup -q -n libks
+%setup -q
 
 %build
 cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_BUILD_TYPE=Release
@@ -28,10 +28,10 @@ rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 
 %files
-/usr/lib/libks2.so*
-%{_includedir}/libks2/*
-/usr/lib64/pkgconfig/libks2.pc
-%doc /usr/share/doc/libks2/copyright
+/usr/lib/libks.so*
+%{_includedir}/libks/*
+/usr/lib64/pkgconfig/libks.pc
+%doc /usr/share/doc/libks/copyright
 
 
 %changelog

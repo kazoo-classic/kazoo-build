@@ -196,8 +196,8 @@
       "spec_file": "libks.spec",
       "sources": [
         {
-          "file": "libks-2-2.0.2.tar.gz",
-          "url": "https://files.freeswitch.org/downloads/libs/libks-2%202.0.2.tar.gz"
+          "file": "libks-1.8.2.tar.gz",
+          "url": "https://github.com/signalwire/libks/archive/refs/tags/v1.8.2.tar.gz"
         }
       ],
       "depends_on": [],
@@ -229,7 +229,7 @@
           "url": "https://files.freeswitch.org/downloads/libs/sphinxbase-0.8.tar.gz"
         }
       ],
-      "depends_on": ["erlang","broadvoice","flite","g722_1","ilbc2","libsilk","sofia-sip","spandsp3","libks"],
+      "depends_on": ["erlang","broadvoice","flite","g722_1","ilbc2","libsilk","sofia-sip","spandsp3"],
       "exclude_modules": ["signalwire"]
     }
   ]

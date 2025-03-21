@@ -3,7 +3,7 @@
 # spec file for package freeswitch
 #
 # includes module(s): freeswitch-devel freeswitch-codec-passthru-amr freeswitch-codec-passthru-amrwb freeswitch-codec-passthru-g729 
-#                     freeswitch-codec-passthru-g7231 freeswitch-lua freeswitch-mariadb freeswitch-pgsql freeswitch-perl freeswitch-python freeswitch-v8 freeswitch-signalwire
+#                     freeswitch-codec-passthru-g7231 freeswitch-lua freeswitch-mariadb freeswitch-pgsql freeswitch-perl freeswitch-python freeswitch-v8
 #                     freeswitch-lan-de freeswitch-lang-en freeswitch-lang-fr freeswitch-lang-hu freeswitch-lang-ru
 #		      and others
 #
@@ -29,6 +29,8 @@
 #
 ######################################################################################################################
 # Module build settings
+%define _unpackaged_files_terminate_build 0
+
 %define build_sng_isdn 0
 %define build_sng_ss7 0
 %define build_sng_tc 0
@@ -38,7 +40,6 @@
 %define build_mod_rayo 1
 %define build_mod_ssml 1
 %define build_mod_v8 0
-%define build_mod_signalwire 0
 
 %{?with_sang_tc:%define build_sng_tc 1 }
 %{?with_sang_isdn:%define build_sng_isdn 1 }
@@ -47,9 +48,9 @@
 %{?with_timerfd:%define build_timerfd 1 }
 %{?with_mod_esl:%define build_mod_esl 1 }
 %{?with_mod_v8:%define build_mod_v8 1 }
-%{?with_mod_signalwire:%define build_mod_signalwire 1 }
 
-%define nonparsedversion 1.10.9.-release
+%define nonparsedversion 1.10.9.-release.15
+%define downloadversion 1.10.9.-release
 %define version %(echo '%{nonparsedversion}' | sed 's/-//g')
 %define release 1
 
@@ -119,7 +120,7 @@ Vendor:       	http://www.freeswitch.org/
 #					Source files and where to get them
 #
 ######################################################################################################################
-Source0:	https://files.freeswitch.org/releases/freeswitch/%{name}-%{nonparsedversion}.tar.gz#/%{name}-%{nonparsedversion}.tar.gz
+Source0:        http://files.freeswitch.org/%{name}-%{nonparsedversion}.tar.bz2
 Source1:	http://files.freeswitch.org/downloads/libs/freeradius-client-1.1.7.tar.gz
 Source2:	http://files.freeswitch.org/downloads/libs/communicator_semi_6000_20080321.tar.gz
 Source3:	http://files.freeswitch.org/downloads/libs/pocketsphinx-0.8.tar.gz
@@ -180,7 +181,15 @@ BuildRequires: devtoolset-9
 # we want use fresh gcc on RHEL 8 based dists
 # On CentOS 8 dist you can install fresh gcc using command
 # dnf install gcc-toolset-9
-BuildRequires: gcc-toolset-9
+BuildRequires: perl-interpreter speexdsp-devel gcc-toolset-9 libuuid-devel gdbm-devel libdb-devel
+%define _annotated_cflags %{nil}
+%endif
+%if 0%{?rhel} == 9
+# we want use fresh gcc on RHEL 8 based dists
+# On CentOS 8 dist you can install fresh gcc using command
+# dnf install gcc-toolset-9
+BuildRequires: perl-interpreter speexdsp-devel libuuid-devel gdbm-devel libdb-devel
+%define perl_archlib /usr/lib64/perl5
 %endif
 
 %if 0%{?suse_version} > 800
@@ -450,15 +459,6 @@ is a "high-performance, distributed memory object caching system, generic in
 nature, but intended for use in speeding up dynamic web applications by 
 alleviating database load." 
 
-%package application-mongo
-Summary:	FreeSWITCH mod_mongo
-Group:		System/Libraries
-Requires:	%{name} = %{version}-%{release}
-BuildRequires:  mongo-c-driver-devel
-
-%description application-mongo
-Provides FreeSWITCH mod_mongo, which implements an API interface to mongodb.
-
 %package application-nibblebill
 Summary:	FreeSWITCH mod_nibblebill
 Group:          System/Libraries
@@ -494,17 +494,6 @@ Requires:       %{name} = %{version}-%{release}
 %description application-rss
 Provides FreeSWITCH mod_rss, edisrse and read an XML based RSS feed, then read
 the entries aloud via a TTS engine
-
-%if %{with build_mod_signalwire}
-%package application-signalwire
-Summary:	FreeSWITCH mod_signalwire
-Group:          System/Libraries
-Requires:       %{name} = %{version}-%{release}
-BuildRequires:  libks signalwire-client-c
-
-%description application-signalwire
-Provides FreeSWITCH mod_signalwire
-%endif
 
 %package application-sms
 Summary:	FreeSWITCH mod_sms
@@ -895,6 +884,7 @@ SCCP/Skinny support for FreeSWITCH open source telephony platform.
 Summary:        Verto endpoint support for FreeSWITCH open source telephony platform
 Group:          System/Libraries
 Requires:       %{name} = %{version}-%{release}
+BuildRequires:  libks
 
 %description endpoint-verto
 Verto protocol support for FreeSWITCH open source telephony platform.
@@ -910,15 +900,6 @@ Verto protocol support for FreeSWITCH open source telephony platform.
 ######################################################################################################################
 #				FreeSWITCH Event Handler Modules
 ######################################################################################################################
-
-%package event-cdr-mongodb
-Summary:	MongoDB CDR Logger for the FreeSWITCH open source telephony platform
-Group:		System/Libraries
-Requires:       %{name} = %{version}-%{release}
-BuildRequires:  mongo-c-driver-devel
-
-%description event-cdr-mongodb
-MongoDB CDR Logger for FreeSWITCH
 
 %package event-cdr-pg-csv
 Summary:	PostgreSQL CDR Logger for the FreeSWITCH open source telephony platform
@@ -1082,7 +1063,7 @@ Group:		System/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	libshout >= 2.2.2
 Requires:	libmpg123 >= 1.20.1
-Requires:	lame
+Requires:	lame-libs
 BuildRequires:	libshout-devel >= 2.2.2
 BuildRequires:	libmpg123-devel >= 1.20.1
 BuildRequires:	lame-devel
@@ -1141,14 +1122,18 @@ BuildRequires:	perl-ExtUtils-Embed
 
 %description	perl
 
-%package        python
+%package        python3
 Summary:        Python support for the FreeSWITCH open source telephony platform
 Group:          System/Libraries
 Requires:       %{name} = %{version}-%{release}
-Requires:       python2
-BuildRequires:  python2-devel
-
-%description    python
+%if 0%{?rhel} == 8
+Requires:       python39
+BuildRequires:  python39-devel
+%else
+Requires:       python3
+BuildRequires:  python3-devel
+%endif
+%description    python3
 
 %if %{build_mod_v8}
 %package v8
@@ -1290,13 +1275,18 @@ Group:		System Environment/Libraries
 %description	-n perl-ESL
 The Perl ESL module allows for native interaction with FreeSWITCH over the event socket interface.
 
-%package	-n python-ESL
+%package	-n python3-ESL
 Summary:	The Python ESL module allows for native interaction with FreeSWITCH over the event socket interface.
 Group:		System Environment/Libraries
-Requires:	python2
-BuildRequires:	python2-devel
+%if 0%{?rhel} == 8
+Requires:	python39
+BuildRequires:	python39-devel
+%else
+Requires:	python3
+BuildRequires:	python3-devel
+%endif
 
-%description	-n python-ESL
+%description	-n python3-ESL
 The Python ESL module allows for native interaction with FreeSWITCH over the event socket interface.
 
 ######################################################################################################################
@@ -1333,7 +1323,6 @@ Requires:	freeswitch-application-memcache
 Requires:	freeswitch-application-nibblebill
 Requires:	freeswitch-application-redis
 Requires:	freeswitch-application-rss
-Requires:	freeswitch-application-signalwire
 Requires:	freeswitch-application-sms
 Requires:	freeswitch-application-snapshot
 Requires:	freeswitch-application-snom
@@ -1368,7 +1357,7 @@ Basic vanilla config set for the FreeSWITCH Open Source telephone platform.
 ######################################################################################################################
 
 %prep
-%setup -b0 -q -n %{name}-%{nonparsedversion}
+%setup -b0 -q -n %{name}-%{downloadversion}
 cp %{SOURCE1} libs/
 cp %{SOURCE2} libs/
 cp %{SOURCE3} libs/
@@ -1415,10 +1404,10 @@ APPLICATION_MODULES_DE+="applications/mod_esl"
 
 APPLICATION_MODULES_FR="applications/mod_fifo applications/mod_fsk applications/mod_fsv applications/mod_hash \
 			applications/mod_httapi applications/mod_http_cache applications/mod_lcr applications/mod_limit \
-			applications/mod_memcache applications/mod_mongo applications/mod_nibblebill applications/mod_rad_auth \
+			applications/mod_memcache applications/mod_nibblebill applications/mod_rad_auth \
 			applications/mod_redis applications/mod_rss "
 
-APPLICATION_MODULES_SZ="applications/mod_signalwire applications/mod_sms applications/mod_snapshot applications/mod_snom applications/mod_soundtouch \
+APPLICATION_MODULES_SZ="applications/mod_sms applications/mod_snapshot applications/mod_snom applications/mod_soundtouch \
 			applications/mod_spandsp applications/mod_spy applications/mod_stress \
 			applications/mod_valet_parking applications/mod_translate applications/mod_voicemail \
 			applications/mod_voicemail_ivr applications/mod_video_filter"
@@ -1483,7 +1472,7 @@ ENDPOINTS_MODULES=" \
 #
 ######################################################################################################################
 EVENT_HANDLERS_MODULES="event_handlers/mod_cdr_csv event_handlers/mod_cdr_pg_csv event_handlers/mod_cdr_sqlite \
-			event_handlers/mod_cdr_mongodb event_handlers/mod_format_cdr event_handlers/mod_erlang_event event_handlers/mod_event_multicast \
+			event_handlers/mod_format_cdr event_handlers/mod_erlang_event event_handlers/mod_event_multicast \
 			event_handlers/mod_event_socket event_handlers/mod_json_cdr event_handlers/mod_kazoo event_handlers/mod_radius_cdr \
 			event_handlers/mod_snmp"
 %if %{build_mod_rayo}
@@ -1507,7 +1496,7 @@ FORMATS_MODULES+=" formats/mod_ssml"
 #						Embedded Languages
 #
 ######################################################################################################################
-LANGUAGES_MODULES="languages/mod_lua languages/mod_perl languages/mod_python "
+LANGUAGES_MODULES="languages/mod_lua languages/mod_perl languages/mod_python3 "
 %if %{build_mod_v8}
 LANGUAGES_MODULES+="languages/mod_v8"
 %endif
@@ -1574,7 +1563,7 @@ export CFLAGS="$CFLAGS -Wno-error=expansion-to-defined"
 %endif
 %if 0%{?rhel} == 8
 # we want use fresh gcc on RHEL 8 based dists
-. /opt/rh/gcc-toolset-9/enable
+# . /opt/rh/gcc-toolset-9/enable
 %endif
 
 ######################################################################################################################
@@ -1623,10 +1612,13 @@ autoreconf --force --install
 %{?configure_options}
 
 unset MODULES
+sed -i s'@-Werror @-Werror -Wno-error=deprecated-declarations -Wno-error=stringop-truncation -Wno-error=array-bounds @' $(find -name Makefile)
+# sed -i /PERL_CFLAGS/s'@-specs=/usr/lib/rpm/redhat/redhat-annobin-cc1@@' $(find -name Makefile)
+
 %{__make}
 
 cd libs/esl
-%{__make} pymod
+%{__make} py3mod
 %{__make} perlmod
 
 
@@ -1656,7 +1648,7 @@ cd libs/esl
 
 #install the esl stuff
 cd libs/esl
-%{__make} DESTDIR=%{buildroot} pymod-install
+%{__make} DESTDIR=%{buildroot} py3mod-install
 %{__make} DESTDIR=%{buildroot} perlmod-install
 
 %if %{build_py26_esl}
@@ -1866,7 +1858,7 @@ fi
 #
 ######################################################################################################################
 %files devel
-%{LIBDIR}/*.so*
+%{LIBDIR}/*.so
 %{PKGCONFIGDIR}/*
 %{INCLUDEDIR}/*.h
 %{INCLUDEDIR}/test/*.h
@@ -1892,7 +1884,6 @@ fi
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/blacklist.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/callcenter.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/cdr_csv.conf.xml
-%config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/cdr_mongodb.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/cdr_pg_csv.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/cdr_sqlite.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/cepstral.conf.xml
@@ -1926,7 +1917,6 @@ fi
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/logfile.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/memcache.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/modules.conf.xml
-%config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/mongo.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/msrp.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/nibblebill.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/opal.conf.xml
@@ -1942,7 +1932,6 @@ fi
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/rtmp.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/sangoma_codec.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/shout.conf.xml
-%config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/signalwire.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/skinny.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/smpp.conf.xml
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/sms_flowroute.conf.xml
@@ -2088,9 +2077,6 @@ fi
 %files application-memcache
 %{MODINSTDIR}/mod_memcache.so*
 
-%files application-mongo
-%{MODINSTDIR}/mod_mongo.so*
-
 %files application-nibblebill
 %{MODINSTDIR}/mod_nibblebill.so*
 
@@ -2102,11 +2088,6 @@ fi
 
 %files application-rss
 %{MODINSTDIR}/mod_rss.so*
-
-%if %{with build_mod_signalwire}
-%files application-signalwire
-%{MODINSTDIR}/mod_signalwire.so*
-%endif
 
 %files application-sms
 %{MODINSTDIR}/mod_sms.so*
@@ -2268,9 +2249,6 @@ fi
 #
 ######################################################################################################################
 
-%files event-cdr-mongodb
-%{MODINSTDIR}/mod_cdr_mongodb.so*
-
 %files event-cdr-pg-csv
 %{MODINSTDIR}/mod_cdr_pg_csv.so*
 
@@ -2352,7 +2330,7 @@ fi
 %{prefix}/perl/*
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/perl.conf.xml
 
-%files python
+%files python3
 %{MODINSTDIR}/mod_python*.so*
 %config(noreplace) %attr(0640, freeswitch, daemon) %{sysconfdir}/autoload_configs/python.conf.xml
 
@@ -2502,7 +2480,7 @@ fi
 %{perl_archlib}/ESL/Dispatch.pm
 %{perl_archlib}/ESL/IVR.pm
 
-%files	-n python-ESL
+%files	-n python3-ESL
 %attr(0644, root, bin) /usr/lib*/python*/site-packages/freeswitch.py*
 %attr(0755, root, bin) /usr/lib*/python*/site-packages/_ESL.so*
 %attr(0755, root, bin) /usr/lib*/python*/site-packages/ESL.py*
@@ -2513,8 +2491,8 @@ fi
 #
 ######################################################################################################################
 %changelog
-* Wed Mar 19 2025 - Mooseable <mooseable@mooseable.com>
-- made mod_signalwire excluded by default and require 'with_mod_signalwire' to build if you still want ti
+* Wed Oct 19 2022 - https://copr.fedorainfracloud.org/coprs/beaveryoga/
+- Copr: changes to support epel-9-x86_64 chroot
 * Fri Jan 31 2020 - Andrey Volk
 - Add sndfile.conf.xml
 * Tue Apr 23 2019 - Andrey Volk
