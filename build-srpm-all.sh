@@ -47,6 +47,8 @@ download_source "https://archive.apache.org/dist/xmlgraphics/fop/binaries/fop-2.
 download_source "https://github.com/rebar/rebar/archive/2.6.4.tar.gz" "rebar-2.6.4.tar.gz"
 download_source "https://github.com/elixir-lang/elixir/archive/v1.5.3.tar.gz" "elixir-1.5.3.tar.gz"
 download_source "https://github.com/okeuday/pqueue/archive/v1.7.0.tar.gz" "pqueue-1.7.0.tar.gz"
+download_source "https://www.kamailio.org/pub/kamailio/5.5.7/src/kamailio-5.5.7_src.tar.gz" "kamailio-5.5.7_src.tar.gz"
+download_source "https://github.com/google/libphonenumber/archive/refs/tags/v9.0.1.tar.gz" "libphonenumber-9.0.1.tar.gz"
 
 # First, let's clean up existing packages if they exist
 echo "Removing existing packages..."
@@ -55,15 +57,12 @@ sudo rpm -e erlang-19 rebar elixir --nodeps 2>/dev/null || true
 # Build order
 echo "Preparing Erlang OTP 19..."
 rpmbuild --define "_topdir /opt/rpmbuild" --define "_buildhost generic-builder" -bs /opt/rpmbuild/SPECS/erlang.spec
-#sudo rpm -i --force /opt/rpmbuild/RPMS/x86_64/erlang-19.3-2.*.rpm
 
 echo "Preparing Rebar..."
 rpmbuild --define "_topdir /opt/rpmbuild" --define "_buildhost generic-builder" -bs /opt/rpmbuild/SPECS/rebar.spec
-#sudo rpm -i --force /opt/rpmbuild/RPMS/x86_64/rebar-2.6.4-1.*.rpm
 
 echo "Preparing Elixir..."
 rpmbuild --define "_topdir /opt/rpmbuild" --define "_buildhost generic-builder" -bs /opt/rpmbuild/SPECS/elixir.spec
-#sudo rpm -i --force /opt/rpmbuild/RPMS/x86_64/elixir-1.5.3-1.*.rpm
 
 echo "Downloading kazoo-configs-core from 4.3-classic branch..."
 if [ ! -d /tmp/kazoo-configs-core ]; then
@@ -99,5 +98,11 @@ fi
 
 echo "Preparing Kazoo..."
 rpmbuild --define "_topdir /opt/rpmbuild" --define "_buildhost generic-builder" -bs /opt/rpmbuild/SPECS/kazoo.spec
+
+## Kamailio
+
+echo "Preparing Kamailio..."
+rpmbuild --define "_topdir /opt/rpmbuild" --define "_buildhost generic-builder" -bs /opt/rpmbuild/SPECS/libphonenumber.spec
+rpmbuild --define "_topdir /opt/rpmbuild" --define "_buildhost generic-builder" -bs /opt/rpmbuild/SPECS/kamailio.spec
 
 echo "DONE"

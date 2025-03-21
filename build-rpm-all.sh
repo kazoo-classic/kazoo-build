@@ -8,6 +8,7 @@
 set -e  # Exit on any error
 
 createrepo_c /opt/rpmbuild/RPMS/
+createrepo_c --update /opt/rpmbuild/RPMS/
 
 
 # empty build dir
@@ -28,6 +29,7 @@ BUILD_ERLANG=false
 BUILD_REBAR=false
 BUILD_ELIXIR=false
 BUILD_KAZOO=false
+BUILD_KAMAILIO=false
 
 # Create directories if they don't exist
 mkdir -p $RPMS_DIR $RESULTS_DIR $LOG_DIR
@@ -105,6 +107,9 @@ parse_arguments() {
             kazoo)
                 BUILD_KAZOO=true
                 ;;
+            kamailio)
+                BUILD_KAMAILIO=true
+                ;;
             *)
                 echo "Warning: Unknown argument '$arg' ignored"
                 ;;
@@ -129,6 +134,10 @@ ask_interactively() {
     if ask_yes_no "Build Kazoo?"; then
         BUILD_KAZOO=true
     fi
+
+    if ask_yes_no "Build Kamailio?"; then
+        BUILD_KAMAILIO=true
+    fi
 }
 
 # Initialize the repository if it doesn't have metadata yet
@@ -151,10 +160,11 @@ echo "  Erlang: $([ "$BUILD_ERLANG" = true ] && echo "YES" || echo "NO")"
 echo "  Rebar: $([ "$BUILD_REBAR" = true ] && echo "YES" || echo "NO")"
 echo "  Elixir: $([ "$BUILD_ELIXIR" = true ] && echo "YES" || echo "NO")"
 echo "  Kazoo: $([ "$BUILD_KAZOO" = true ] && echo "YES" || echo "NO")"
+echo "  Kamailio: $([ "$BUILD_KAMAILIO" = true ] && echo "YES" || echo "NO")"
 echo ""
 
 # Proceed only if at least one package is selected
-if [ "$BUILD_ERLANG" = false ] && [ "$BUILD_REBAR" = false ] && [ "$BUILD_ELIXIR" = false ] && [ "$BUILD_KAZOO" = false ]; then
+if [ "$BUILD_ERLANG" = false ] && [ "$BUILD_REBAR" = false ] && [ "$BUILD_ELIXIR" = false ] && [ "$BUILD_KAZOO" = false ] && [ "$BUILD_KAMAILIO" = false ]; then
     echo "No packages selected for building. Exiting."
     exit 0
 fi
@@ -180,6 +190,13 @@ if [ "$BUILD_KAZOO" = true ]; then
     echo "Found Kazoo SRPM: $(basename $KAZOO_SRPM)"
 fi
 
+if [ "$BUILD_KAMAILIO" = true ]; then
+    LIBPHONENUMBER_SRPM=$(get_latest_srpm "libphonenumber-")
+    echo "Found Libphonenumber SRPM: $(basename $LIBPHONENUMBER_SRPM)"
+    KAMAILIO_SRPM=$(get_latest_srpm "kamailio-")
+    echo "Found Kamailio SRPM: $(basename $KAMAILIO_SRPM)"
+fi
+
 echo ""
 
 # Build selected packages in order (dependencies first)
@@ -197,6 +214,11 @@ fi
 
 if [ "$BUILD_KAZOO" = true ]; then
     build_package "$KAZOO_SRPM"
+fi
+
+if [ "$BUILD_KAMAILIO" = true ]; then
+    build_package "$LIBPHONENUMBER_SRPM"
+    build_package "$KAMAILIO_SRPM"
 fi
 
 echo "=========================================================="
