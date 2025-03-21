@@ -163,14 +163,17 @@ if [ $1 -eq 0 ] ; then
     # Package removal, not upgrade
     systemctl disable kazoo-applications
     /usr/sbin/userdel kazoo
+    rm -f /usr/lib/systemd/system/kazoo-applications.service
+    systemctl daemon-reload
     rm -rf /opt/kazoo
-    rm -rf /etc/kazoo
     rm -rf /var/log/kazoo
 fi
 
 %changelog
 * Fri Mar 14 2025 Mooseable <mooseable@mooseable.com> - 4.3-3
 - Removed erroneous file copy
+- Removed deletion of /etc/kazoo on uninstall
+- Added service file cleanup and daemon-reload
 
 * Fri Mar 14 2025 Mooseable <mooseable@mooseable.com> - 4.3-2
 - Updated kazoo-applications script to better detect that kazoo is running
