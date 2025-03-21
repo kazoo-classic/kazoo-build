@@ -231,6 +231,86 @@
       ],
       "depends_on": ["erlang","broadvoice","flite","g722_1","ilbc2","libsilk","sofia-sip","spandsp3"],
       "exclude_modules": ["signalwire"]
+    },
+    {
+      "name": "couchdb",
+      "enabled": true,
+      "spec_file": "couchdb.spec",
+      "git_repos": [
+        {
+          "name": "couchdb",
+          "url": "https://github.com/apache/couchdb.git",
+          "branch": "3.0.x",
+          "output": "couchdb-3.0.1.tar.gz"
+        }        
+      ],
+      "sources": [
+        {
+          "file": "ibrowse-4.4.0.tar.gz",
+          "url": "https://github.com/cmullaparthi/ibrowse/archive/refs/tags/v4.4.0.tar.gz"
+        },
+        {
+          "file": "couchdb-config-2.1.7.tar.gz",
+          "url": "https://github.com/apache/couchdb-config/archive/refs/tags/2.1.7.tar.gz"
+        },
+        {
+          "file": "couchdb-b64url-1.0.2.tar.gz",
+          "url": "https://github.com/apache/couchdb-b64url/archive/refs/tags/1.0.2.tar.gz"
+        },
+        {
+          "file": "couchdb-ets-lru-1.1.0.tar.gz",
+          "url": "https://github.com/apache/couchdb-ets-lru/archive/refs/tags/1.1.0.tar.gz"
+        },
+        {
+          "file": "couchdb-khash-1.1.0.tar.gz",
+          "url": "https://github.com/apache/couchdb-khash/archive/refs/tags/1.1.0.tar.gz"
+        },
+        {
+          "file": "couchdb-snappy-CouchDB-1.0.4.tar.gz",
+          "url": "https://github.com/apache/couchdb-snappy/archive/refs/tags/CouchDB-1.0.4.tar.gz"
+        },
+        {
+          "file": "couchdb-documentation-3.0.1-RC1.tar.gz",
+          "url": "https://github.com/apache/couchdb-documentation/archive/refs/tags/3.0.1-RC1.tar.gz"
+        },
+        {
+          "file": "couchdb-fauxton-v1.2.4.tar.gz",
+          "url": "https://github.com/apache/couchdb-fauxton/archive/refs/tags/v1.2.4.tar.gz"
+        },
+        {
+          "file": "couchdb-folsom-CouchDB-0.8.3.tar.gz",
+          "url": "https://github.com/apache/couchdb-folsom/archive/refs/tags/CouchDB-0.8.3.tar.gz"
+        },
+        {
+          "file": "couchdb-hyper-CouchDB-2.2.0-6.tar.gz",
+          "url": "https://github.com/apache/couchdb-hyper/archive/refs/tags/CouchDB-2.2.0-6.tar.gz"
+        },
+        {
+          "file": "couchdb-jiffy-CouchDB-1.0.4-1.tar.gz",
+          "url": "https://github.com/apache/couchdb-jiffy/archive/refs/tags/CouchDB-1.0.4-1.tar.gz"
+        },
+        {
+          "file": "couchdb-mochiweb-v2.20.0.tar.gz",
+          "url": "https://github.com/apache/couchdb-mochiweb/archive/refs/tags/v2.20.0.tar.gz"
+        },
+        {
+          "file": "couchdb-meck-0.8.8.tar.gz",
+          "url": "https://github.com/apache/couchdb-meck/archive/refs/tags/0.8.8.tar.gz"
+        },
+        {
+          "file": "couchdb-recon-2.5.0.tar.gz",
+          "url": "https://github.com/apache/couchdb-recon/archive/refs/tags/2.5.0.tar.gz"
+        },
+        {
+          "file": "proper-v1.3.tar.gz",
+          "url": "https://github.com/proper-testing/proper/archive/refs/tags/v1.3.tar.gz"
+        },
+        {
+          "file": "couchdb-bear-0.8.1.tar.gz",
+          "url": "https://github.com/apache/couchdb-bear/archive/refs/tags/0.8.1.tar.gz"
+        }
+      ],
+      "depends_on": ["erlang","rebar"]
     }
   ]
 }

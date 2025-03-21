@@ -71,12 +71,13 @@ handle_git_repo() {
   if [ ! -d "$repo_path" ]; then
     rm -rf "$repo_path"
     git clone "$repo_url" "$repo_path"
-    if [ -n "$branch" ] && [ "$branch" != "master" ]; then
-      (cd "$repo_path" && git checkout "$branch")
-    fi
   else
     echo "Updating $repo_name..."
     (cd "$repo_path" && git reset --hard HEAD && git pull)
+  fi
+  if [ -n "$branch" ] && [ "$branch" != "master" ]; then
+    echo "Switching to $branch brach"
+    (cd "$repo_path" && git checkout "$branch")
   fi
   
   tar -czf "${SOURCES_DIR}/${tarball_name}" -C "$TEMP_DIR" "$repo_name"
