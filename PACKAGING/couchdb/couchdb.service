@@ -1,0 +1,17 @@
+[Unit]
+Description=CouchDB Server
+After=network.target
+
+[Service]
+ExecStart=%{_bindir}/couchdb
+Environment=COUCHDB_ARGS_FILE=/etc/couchdb/vm.args
+Environment="COUCHDB_INI_FILES=/etc/couchdb/default.ini /etc/couchdb/default.d /etc/couchdb/local.ini /etc/couchdb/local.d"
+User=couchdb
+Group=couchdb
+LimitNOFILE=100000
+KillMode=process
+ExecStopPost=/bin/bash -c 'until /opt/couchdb/erts-*/bin/epmd -names | (! (grep -q "^name couchdb at" && echo "CouchDB process still running...")); do sleep 1; done'
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

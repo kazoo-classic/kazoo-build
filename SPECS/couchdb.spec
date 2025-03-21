@@ -5,6 +5,8 @@
 %define _build_id_links none
 # Needed to avoid build error: No build ID note found in [...].o
 %undefine _missing_build_ids_terminate_build
+# point this to your init/logrotate/service/tmpfiles location
+%define _sourcedir %{_builddir}/../PACKAGING/couchdb
 
 Name:          couchdb
 Version:       3.0.1
@@ -14,8 +16,8 @@ Group:         Applications/Databases
 License:       Apache
 URL:           http://couchdb.apache.org/
 Source0:       couchdb-%{version}.tar.gz
-Source1:       proper-v1.3.tar.gz
-Source2:       couchdb-bear-0.8.1.tar.gz
+Source1:       %{_sourcedir}/couchdb.service
+Source2:       %{_sourcedir}/couchdb
 Source3:       ibrowse-4.4.0.tar.gz
 Source4:       couchdb-config-2.1.7.tar.gz
 Source5:       couchdb-b64url-1.0.2.tar.gz
@@ -30,7 +32,8 @@ Source13:      couchdb-jiffy-CouchDB-1.0.4-1.tar.gz
 Source14:      couchdb-mochiweb-v2.20.0.tar.gz
 Source15:      couchdb-meck-0.8.8.tar.gz
 Source16:      couchdb-recon-2.5.0.tar.gz
-
+Source17:      proper-v1.3.tar.gz
+Source18:      couchdb-bear-0.8.1.tar.gz
 %if 0%{?fedora} >= 33
 # Erlang 22 or below is not available anymore on Fedora 33, so use the compiled
 # version from https://copr.fedorainfracloud.org/coprs/adrienverge/couchdb/
@@ -152,45 +155,6 @@ install -D -m 755 %{SOURCE2} %{buildroot}%{_bindir}/%{name}
 # Have conf in /etc/couchdb, not /opt/couchdb/etc
 mkdir -p %{buildroot}%{_sysconfdir}
 mv %{buildroot}/opt/couchdb/etc %{buildroot}%{_sysconfdir}/%{name}
-
-# Create the systemd service file
-mkdir -p %{buildroot}/usr/lib/systemd/system
-cat > %{buildroot}/usr/lib/systemd/system/%{name}.service << 'EOF'
-[Unit]
-Description=CouchDB Server
-After=network.target
-
-[Service]
-ExecStart=%{_bindir}/couchdb
-Environment=COUCHDB_ARGS_FILE=/etc/couchdb/vm.args
-Environment="COUCHDB_INI_FILES=/etc/couchdb/default.ini /etc/couchdb/default.d /etc/couchdb/local.ini /etc/couchdb/local.d"
-User=couchdb
-Group=couchdb
-LimitNOFILE=100000
-KillMode=process
-ExecStopPost=/bin/bash -c 'until /opt/couchdb/erts-*/bin/epmd -names | (! (grep -q "^name couchdb at" && echo "CouchDB process still running...")); do sleep 1; done'
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-EOF
-# End Create systemd service file
-
-# Create the executable script
-mkdir -p %{buildroot}%{_bindir}
-cat > %{buildroot}%{_bindir}/couchdb << 'EOF'
-#!/bin/bash
-clean_exit() {
-  kill -TERM $child 2>/dev/null
-}
-trap clean_exit EXIT
-/opt/couchdb/bin/couchdb "$@" &
-child=$!
-wait $child
-EOF
-# Make the script executable
-chmod 755 %{buildroot}%{_bindir}/couchdb
-# End the executable script
 
 install -D -m 644 %{SOURCE1} %{buildroot}/usr/lib/systemd/system/%{name}.service
 
