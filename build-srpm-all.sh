@@ -29,6 +29,7 @@ TEMP_DIR=$(jq -r '.temp_dir' "$CONFIG_FILE")
 SPEC_DIR="${RPMBUILD_DIR}/SPECS"
 SOURCES_DIR="${RPMBUILD_DIR}/SOURCES"
 SRPMS_DIR="${RPMBUILD_DIR}/SRPMS"
+PACKAGING_DIR="${RPMBUILD_DIR}/PACKAGING"
 
 # Create a local repo meta
 echo "Creating local repo metadata..."
@@ -47,11 +48,7 @@ download_source() {
   local output="$2"
 
   if [ -f "$output" ]; then
-    read -p "File $output exists. Overwrite? (y/n): " answer
-    case $answer in
-      [Yy]* ) wget -O "$output" "$url";;
-      * ) echo "Skipping $output";;
-    esac
+    echo "Skipping $output"
   else
     wget -O "$output" "$url"
   fi
@@ -81,6 +78,19 @@ handle_git_repo() {
   fi
   
   tar -czf "${SOURCES_DIR}/${tarball_name}" -C "$TEMP_DIR" "$repo_name"
+}
+
+# Function to copy package-specific files from PACKAGING to SOURCES
+copy_packaging_files() {
+  local package_name="$1"
+  local package_dir="${PACKAGING_DIR}/${package_name}"
+  
+  if [ -d "$package_dir" ]; then
+    echo "Copying files from ${package_dir} to ${SOURCES_DIR}"
+    find "$package_dir" -type f -exec cp -v {} "${SOURCES_DIR}/" \;
+  else
+    echo "Warning: No packaging directory found for ${package_name} at ${package_dir}"
+  fi
 }
 
 # Function to build an SRPM from a spec file
@@ -180,6 +190,10 @@ for i in $(seq 0 $(($PACKAGE_COUNT - 1))); do
   
   SPEC_FILE=$(jq -r ".packages[$i].spec_file" "$CONFIG_FILE")
   echo "Building SRPM for: $PACKAGE_NAME"
+  
+  # Copy package-specific files again right before building to ensure they're present
+  copy_packaging_files "$PACKAGE_NAME"
+  
   build_srpm "$SPEC_FILE"
 done
 

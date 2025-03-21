@@ -5,8 +5,6 @@
 %define _build_id_links none
 # Needed to avoid build error: No build ID note found in [...].o
 %undefine _missing_build_ids_terminate_build
-# point this to your init/logrotate/service/tmpfiles location
-%define _sourcedir %{_builddir}/../PACKAGING/couchdb
 
 Name:          couchdb
 Version:       3.0.1
@@ -16,8 +14,8 @@ Group:         Applications/Databases
 License:       Apache
 URL:           http://couchdb.apache.org/
 Source0:       couchdb-%{version}.tar.gz
-Source1:       %{_sourcedir}/couchdb.service
-Source2:       %{_sourcedir}/couchdb
+Source1:       couchdb.service
+Source2:       couchdb
 Source3:       ibrowse-4.4.0.tar.gz
 Source4:       couchdb-config-2.1.7.tar.gz
 Source5:       couchdb-b64url-1.0.2.tar.gz
