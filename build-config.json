@@ -44,8 +44,8 @@
       "spec_file": "elixir.spec",
       "sources": [
         {
-          "file": "elixir-1.5.3.tar.gz",
-          "url": "https://github.com/elixir-lang/elixir/archive/v1.5.3.tar.gz"
+          "file": "elixir-1.6.6.tar.gz",
+          "url": "https://github.com/elixir-lang/elixir/archive/v1.6.6.tar.gz"
         }
       ],
       "depends_on": ["erlang"]
@@ -311,6 +311,19 @@
         }
       ],
       "depends_on": ["erlang","rebar"]
+    },
+    {
+      "name": "rabbitmq-server",
+      "enabled": true,
+      "spec_file": "rabbitmq-server.spec",
+      "sources": [
+        {
+          "file": "rabbitmq-server-3.7.10.tar.xz",
+          "url": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.10/rabbitmq-server-3.7.10.tar.xz"
+        }
+      ],
+      "depends_on": ["erlang","broadvoice","flite","g722_1","ilbc2","libsilk","sofia-sip","spandsp3"],
+      "exclude_modules": ["signalwire"]
     }
   ]
 }
