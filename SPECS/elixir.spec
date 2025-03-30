@@ -2,12 +2,12 @@
 %define _buildhost generic-builder
 
 Name:           elixir
-Version:        1.5.3
+Version:        1.6.6
 Release:        1%{?dist}
 Summary:        A functional meta-programming aware language built on top of the Erlang VM
 License:        ASLv2
 URL:            https://elixir-lang.org
-Source0:        https://github.com/elixir-lang/elixir/archive/v%{version}.tar.gz#/elixir-%{version}.tar.gz
+Source0:        https://github.com/elixir-lang/elixir/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  erlang = 19.3
 BuildRequires:  git
 BuildRequires:  rebar = 2.6.4
@@ -76,5 +76,8 @@ chmod 755 %{buildroot}%{_prefix}/lib/elixir/bin/*
 %{_prefix}/lib/elixir/lib/mix/**
 
 %changelog
+* Sun Mar 03 2025 Mooseable <mooseable@mooseable.com> - 1.5.3-2
+- Update to Elixir 1.6.6
+
 * Tue Oct 29 2024 Mooseable <mooseable@mooseable.com> - 1.5.3-1
 - Initial package

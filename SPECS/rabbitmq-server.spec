@@ -6,14 +6,14 @@ Version: 3.7.10
 Release: 1%{?dist}
 License: MPLv1.1 and MIT and ASL 2.0 and BSD
 Group: %{group_tag}
-Source: http://www.rabbitmq.com/releases/rabbitmq-server/v%{upstream_version}/%{name}-%{upstream_version}.tar.xz
+Source: https://github.com/rabbitmq/rabbitmq-server/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Source1: rabbitmq-server.init
 Source2: rabbitmq-server.logrotate
 Source3: rabbitmq-server.service
 Source4: rabbitmq-server.tmpfiles
 URL: http://www.rabbitmq.com/
 BuildArch: noarch
-BuildRequires: erlang >= %{erlang_minver}, python-simplejson, xmlto, libxslt, gzip, sed, zip, rsync
+BuildRequires: erlang >= %{erlang_minver}, python3-simplejson, python2, python2-devel xmlto, libxslt, gzip, sed, zip, rsync, elixir >= 1.6.6
 
 %if 0%{?fedora} || 0%{?rhel} >= 7 || 0%{?suse_version} >= 1315
 BuildRequires:  systemd
@@ -37,7 +37,7 @@ RabbitMQ is an open source multi-protocol messaging broker.
 
 # We want to install into /usr/lib, even on 64-bit platforms
 %define _rabbit_libdir %{_exec_prefix}/lib/rabbitmq
-%define _rabbit_erllibdir %{_rabbit_libdir}/lib/rabbitmq_server-%{upstream_version}
+%define _rabbit_erllibdir %{_rabbit_libdir}/lib/rabbitmq_server-3.7.10
 %define _rabbit_server_ocf scripts/rabbitmq-server.ocf
 %define _plugins_state_dir %{_localstatedir}/lib/rabbitmq/plugins
 %define _rabbit_server_ha_ocf scripts/rabbitmq-server-ha.ocf
@@ -50,10 +50,18 @@ RabbitMQ is an open source multi-protocol messaging broker.
 
 
 %prep
-%setup -q -n %{name}-%{upstream_version}
+%setup -q -n %{name}-3.7.10
 
 %build
-cp -a deps/rabbit/docs/README-for-packages %{_builddir}/rabbitmq-server-%{upstream_version}/README
+# Create a symlink for python
+ln -sf /usr/bin/python2.7 %{_builddir}/python
+export PATH=%{_builddir}:$PATH
+
+# Set proper locale for the build
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+
+cp -a deps/rabbit/docs/README-for-packages %{_builddir}/rabbitmq-server-3.7.10/README
 env -u DEPS_DIR make %{?_smp_mflags} dist manpages
 
 %install
@@ -84,13 +92,13 @@ mkdir -p %{buildroot}%{_sysconfdir}/rabbitmq
 
 mkdir -p %{buildroot}%{_sbindir}
 sed -e 's|@STDOUT_STDERR_REDIRECTION@||' \
-        -e 's|@RABBITMQ_USER@|%{_rabbitmq_user}|' -e 's|@RABBITMQ_GROUP@|%{_rabbitmq_group}|' \
-        < scripts/rabbitmq-script-wrapper \
-        > %{buildroot}%{_sbindir}/rabbitmqctl
+	-e 's|@RABBITMQ_USER@|%{_rabbitmq_user}|' -e 's|@RABBITMQ_GROUP@|%{_rabbitmq_group}|' \
+	< scripts/rabbitmq-script-wrapper \
+	> %{buildroot}%{_sbindir}/rabbitmqctl
 chmod 0755 %{buildroot}%{_sbindir}/rabbitmqctl
 for script in rabbitmq-server rabbitmq-plugins rabbitmq-diagnostics; do \
-        cp -a %{buildroot}%{_sbindir}/rabbitmqctl \
-         %{buildroot}%{_sbindir}/$script; \
+	cp -a %{buildroot}%{_sbindir}/rabbitmqctl \
+	 %{buildroot}%{_sbindir}/$script; \
 done
 
 %if 0%{?fedora} > 14 || 0%{?rhel} >= 7 || 0%{?suse_version} >= 1315

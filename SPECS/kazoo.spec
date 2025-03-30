@@ -2,7 +2,7 @@
 
 Name:           kazoo-classic
 Version:        4.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Kazoo - Open-Source Cloud Communications Platform
 License:        MPL-2.0
 URL:            https://github.com/kazoo-classic/kazoo
@@ -11,7 +11,7 @@ Source1:        kazoo-configs-core-%{version}.tar.gz
 Source2:        pqueue-1.7.0.tar.gz
 BuildRequires:  git
 BuildRequires:  erlang = 19.3
-BuildRequires:  elixir = 1.5.3
+BuildRequires:  elixir = 1.6.6
 BuildRequires:  rebar = 2.6.4
 BuildRequires:  make
 BuildRequires:  gcc
@@ -170,6 +170,9 @@ if [ $1 -eq 0 ] ; then
 fi
 
 %changelog
+* Sun Mar 30 2025 Mooseable <mooseable@mooseable.com> - 4.3-4
+- Set Elixir version to 1.6.6
+
 * Fri Mar 14 2025 Mooseable <mooseable@mooseable.com> - 4.3-3
 - Removed erroneous file copy
 - Removed deletion of /etc/kazoo on uninstall
