@@ -3,7 +3,7 @@ Description=CouchDB Server
 After=network.target
 
 [Service]
-ExecStart=%{_bindir}/couchdb
+ExecStart=/usr/bin/couchdb
 Environment=COUCHDB_ARGS_FILE=/etc/couchdb/vm.args
 Environment="COUCHDB_INI_FILES=/etc/couchdb/default.ini /etc/couchdb/default.d /etc/couchdb/local.ini /etc/couchdb/local.d"
 User=couchdb
